@@ -20,10 +20,11 @@ num_workers = 4  # 工作线程数
 label_smoothing = 0.1  # 标签平滑，默认为0
 
 # 训练相关参数
-num_epochs = 35  # 训练轮数
+num_epochs = 40  # 训练轮数
 learning_rate = 1e-4  # 学习率
 weight_decay = 1e-3  # 权重衰减
-patience = 7  # 耐心值
+dropout_prob = 0.2  # Dropout概率
+patience = 8  # 耐心值
 delta = 0.001  # 停止条件，提升小于该值则停止训练
 
 # 辅助分类器权重，默认为0.3
@@ -65,8 +66,8 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"\nUsing device(使用设备为): {device}")
 
-    # 初始化模型
-    model = get_frozen_googlenet(len(train_dataset.classes)).to(device)
+    # 初始化模型,参数：类别数量, dropout概率
+    model = get_frozen_googlenet(len(train_dataset.classes), dropout_prob=dropout_prob).to(device)
 
     # 定义损失函数
     # 标签平滑

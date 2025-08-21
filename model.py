@@ -4,7 +4,7 @@ from torchvision.models import GoogLeNet_Weights
 
 
 class CustomGoogLeNet(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, dropout_prob=0.5):
         super().__init__()
         # 加载预训练模型
         # 主干预训练，辅助分支默认随机初始化
@@ -22,26 +22,36 @@ class CustomGoogLeNet(nn.Module):
         # 这里以解冻最后3个Inception模块为例（可根据实际情况增减）
         # 注意：不同版本torchvision的层命名可能略有差异，需结合模型结构调整
         for name, param in self.model.named_parameters():
-            # 解冻inception4d、inception4e、inception5a、inception5b（较深层）
-            if any(layer in name for layer in ['inception4d', 'inception4e', 'inception5a', 'inception5b']):
+            # 可解冻inception4d、inception4e、inception5a、inception5b（较深层）
+            # 这里根据实际情况进行调整：
+            if any(layer in name for layer in ['inception4e', 'inception5a', 'inception5b']):
                 param.requires_grad = True
 
         # 3. 替换并解冻主分类器（全连接层）
         in_features = self.model.fc.in_features
-        self.model.fc = nn.Linear(in_features, num_classes)
+        self.model.fc = nn.Sequential(
+            nn.Dropout(p=dropout_prob),  # Dropout
+            nn.Linear(in_features, num_classes)
+        )
         for param in self.model.fc.parameters():
             param.requires_grad = True
 
         # 4. 替换并解冻辅助分类器（若启用）
         if self.model.aux_logits:
             # 替换辅助分类器全连接层
-            self.model.aux1.fc2 = nn.Linear(1024, num_classes)
-            self.model.aux2.fc2 = nn.Linear(1024, num_classes)
-            # 初始化权重
-            nn.init.xavier_uniform_(self.model.aux1.fc2.weight)
-            nn.init.zeros_(self.model.aux1.fc2.bias)
-            nn.init.xavier_uniform_(self.model.aux2.fc2.weight)
-            nn.init.zeros_(self.model.aux2.fc2.bias)
+            self.model.aux1.fc2 = nn.Sequential(
+                nn.Dropout(p=dropout_prob),  # Dropout
+                nn.Linear(1024, num_classes)
+            )
+            self.model.aux2.fc2 = nn.Sequential(
+                nn.Dropout(p=dropout_prob),  # Dropout
+                nn.Linear(1024, num_classes)
+            )
+            # 初始化权重,访问Sequential中的Linear
+            nn.init.xavier_uniform_(self.model.aux1.fc2[1].weight)
+            nn.init.zeros_(self.model.aux1.fc2[1].bias)
+            nn.init.xavier_uniform_(self.model.aux2.fc2[1].weight)
+            nn.init.zeros_(self.model.aux2.fc2[1].bias)
             # 解冻辅助分类器
             for param in self.model.aux1.parameters():
                 param.requires_grad = True
@@ -65,11 +75,21 @@ class CustomGoogLeNet(nn.Module):
 
     @property
     def fc(self):
-        """提供对主分类器的直接访问（供优化器使用）"""
-        return self.model.fc
+        """提供对主分类器Linear层的直接访问"""
+        return self.model.fc[1]  # 返回Sequential中的Linear层
+
+    @property
+    def aux1_fc(self):
+        """提供对辅助分类器1的Linear层访问（可选）"""
+        return self.model.aux1.fc2[1]
+
+    @property
+    def aux2_fc(self):
+        """提供对辅助分类器2的Linear层访问（可选）"""
+        return self.model.aux2.fc2[1]
 
 
-def get_frozen_googlenet(num_classes):
+def get_frozen_googlenet(num_classes, dropout_prob=0.5):
     """创建并返回冻结特征层的GoogleNet模型"""
-    model = CustomGoogLeNet(num_classes)
+    model = CustomGoogLeNet(num_classes, dropout_prob=dropout_prob)
     return model

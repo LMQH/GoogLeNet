@@ -15,21 +15,22 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
             scale=(0.90, 1.0),  # 裁剪区域占原图比例范围
             ratio=(0.90, 1.05)  # 宽高比范围
         ),
-        transforms.RandomHorizontalFlip(p=0.3),  # 随机水平翻转
-        transforms.RandomRotation(10),   # 随机旋转
+        # transforms.RandomHorizontalFlip(p=0.3),  # 随机水平翻转
+        transforms.RandomRotation(5),   # 随机旋转
         transforms.ColorJitter(         # 随机改变亮度、对比度、饱和度
-            brightness=0.2,
-            contrast=0.2,
-            saturation=0.2,
-            hue=0.02
+            brightness=0.1,  # 亮度
+            contrast=0.1,  # 对比度
+            saturation=0.1,  # 饱和度
+            hue=0.02  # 色调
         ),
-        transforms.RandomAffine(        # 平移+缩放+旋转
-            degrees=0,
+        transforms.RandomAffine(        # 平移+缩放
+            degrees=0,  # 旋转角度
             translate=(0.05, 0.05),
             scale=(0.95, 1.05)
         ),
         transforms.RandomPerspective(distortion_scale=0.2, p=0.2),  # 透视变换
         transforms.ToTensor(),
+        transforms.RandomErasing(p=0.2, scale=(0.02, 0.1), ratio=(0.3, 3.3)),  # 随机擦除
         transforms.Normalize(           # 使用 ImageNet 预训练模型的均值和标准差
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225]

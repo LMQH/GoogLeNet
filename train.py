@@ -84,21 +84,11 @@ def train_model(
         # _,忽略索引
         for _, (inputs, labels) in enumerate(train_pbar):
 
-            # # 处理输入图像
-            # if not isinstance(inputs, torch.Tensor):
-            #     inputs = torch.as_tensor(inputs, dtype=torch.float32)
-
-            # print(f"\ntype(labels)={type(labels)}, labels.shape={getattr(labels, 'shape', 'N/A')}")
-
             assert isinstance(inputs, torch.Tensor)
             assert isinstance(labels, torch.Tensor)
 
             inputs = inputs.to(device)
             labels = labels.to(device)
-
-            # 处理标签
-            # labels = process_labels(labels)
-            # 已经没有必要处理了
 
             optimizer.zero_grad(set_to_none=True)
 
@@ -177,7 +167,7 @@ def train_model(
 
         # 检查是否需要提前停止
         if early_stopping.early_stop:
-            print("---早停触发，终止训练---")
+            print(f">> EarlyStop at Epoch {epoch + 1}/{num_epochs} (早停触发，终止训练)")
             # 新增：记录早停事件
             logger.add_text('Training_Event', 'Early Stopping Triggered', epoch)
             break
