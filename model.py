@@ -50,7 +50,7 @@ class CustomGoogLeNet(nn.Module):
 
     # 重写前向传播
     def forward(self, x):
-        # 关键：根据模型模式（train/eval）动态处理输出
+        # 根据模型模式（train/eval）动态处理输出
         if self.model.aux_logits:
             if self.training:
                 # 返回顺序是 (main, aux2, aux1)

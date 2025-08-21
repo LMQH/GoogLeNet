@@ -1,5 +1,5 @@
 # __init__.py
-from .test import test_model  # 从当前目录的test.py导入test_model
+from .test import test_model
 from .data import get_card_dataloaders
 from .model import get_frozen_googlenet
 from .train import train_model
