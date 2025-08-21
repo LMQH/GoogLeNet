@@ -8,9 +8,6 @@ class TensorBoardLogger:
     def __init__(self, log_dir: str, experiment_name: str, subdir: str = ""):
         """
         初始化TensorBoard日志记录器
-        :param log_dir: 基础日志目录
-        :param experiment_name: 实验名称
-        :param subdir: 子目录（如"train"、"test"）
         """
         self.log_dir = str(log_dir)
         self.experiment_name = str(experiment_name)

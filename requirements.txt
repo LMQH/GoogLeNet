@@ -1,0 +1,18 @@
+# PyTorch and TorchVision (核心深度学习框架)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# 进度条显示
+tqdm>=4.60.0
+
+# TensorBoard 日志支持
+tensorboard>=2.10.0
+
+# 数据处理（如果使用）
+numpy>=1.21.0
+
+# 配置文件支持（推荐使用 YAML 管理超参数）
+# pyyaml>=6.0
+
+# 可选：图像处理增强（虽然 torchvision 内置，但 Pillow 是底层依赖）
+# Pillow>=9.0.0
