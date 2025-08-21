@@ -1,15 +1,6 @@
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
-# import torch
-
-
-# 批量处理数据
-# def collate_fn(batch):
-#     images, labels = zip(*batch)  # 拆开
-#     images = torch.stack(images, dim=0)  # 拼成 [batch, C, H, W] Tensor
-#     labels = torch.tensor(labels, dtype=torch.long)
-#     return images, labels
 
 
 def get_card_dataloaders(data_root, batch_size, num_workers):
@@ -78,7 +69,7 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True,
-        # collate_fn=collate_fn  # 批量处理数据
+        # collate_fn=collate_fn
     )
 
     valid_loader: DataLoader = DataLoader(
