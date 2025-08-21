@@ -69,7 +69,7 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
-        pin_memory=True,
+        pin_memory=True,  # 启用内存映射
         # collate_fn=collate_fn
     )
 

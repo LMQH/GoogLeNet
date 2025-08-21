@@ -9,21 +9,21 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import time
 
 
-# ----------------------------
-# 超参数配置
-# ----------------------------
+# --------------------------------------
+# 超参数配置 Super parameter configuration
+# --------------------------------------
 
 # 数据相关参数
 data_root = "../dataset/cards_image/img"
-batch_size = 32  # 批次大小
-num_workers = 4  # 工作线程数
+batch_size = 64  # 批次大小
+num_workers = 8  # 工作线程数
 label_smoothing = 0.1  # 标签平滑，默认为0
 
 # 训练相关参数
-num_epochs = 40  # 训练轮数
+num_epochs = 50  # 训练轮数
 learning_rate = 1e-4  # 学习率
 weight_decay = 1e-3  # 权重衰减
-dropout_prob = 0.2  # Dropout概率
+dropout_prob = 0.3  # Dropout概率
 patience = 8  # 耐心值
 delta = 0.001  # 停止条件，提升小于该值则停止训练
 
@@ -42,7 +42,7 @@ experiment_name = "googlenet_card_classification"  # 实验名称
 
 
 # ----------------------------
-# 主函数
+# 主函数 main()
 # ----------------------------
 def main():
     # 加载数据
