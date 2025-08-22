@@ -5,37 +5,46 @@ from data import get_card_dataloaders
 from model import get_frozen_googlenet
 from train import train_model
 from test import test_model
-from torch.optim.lr_scheduler import CosineAnnealingLR
 import time
 
 
-# 未下载数据集则使用kagglehub
+# 未下载数据集可使用kagglehub
 # import kagglehub
 # path = kagglehub.dataset_download("gpiosenka/cards_image-datasetclassification")
-# print("Path to dataset files:", path)  # 查看下载的默认路径
+# print("Path to dataset files:", path)  # 查看下载的默认路径，保存到项目相同路径下
 
 
 # --------------------------------------
 # 超参数配置 Super parameter configuration
 # --------------------------------------
 
-# 数据相关参数
+# 数据集路径
 data_root = "../dataset/cards_image/img"
-batch_size = 64  # 批次大小
+
+# 根据GPU内存自动调整批处理大小
+gpu_memory = torch.cuda.get_device_properties(0).total_memory
+batch_size = min(128, int(gpu_memory / (1024**3) * 32))  # 经验公式
+# batch_size = 64  # 批次大小
+
 num_workers = 8  # 工作线程数
 label_smoothing = 0.1  # 标签平滑，默认为0
 
 # 训练相关参数
 num_epochs = 40  # 训练轮数
+
+# 优化器参数
 learning_rate = 1e-4  # 学习率
 weight_decay = 1e-3  # 权重衰减
+
 dropout_prob = 0.2  # Dropout概率
 patience = 7  # 耐心值
 delta = 0.001  # 停止条件，提升小于该值则停止训练
 
+# OneCycleLR参数
+max_lr = learning_rate * 10  # 最大学习率
+pct_start = 0.3  # 学习率上升阶段比例
+
 # 辅助分类器权重，默认为0.3
-# 如果 w 较小，辅助分类器对梯度贡献有限，前几轮主分类器更新慢
-# 如果 w 太大，初始阶段随机辅助输出会引入噪声，也可能让训练不稳定
 W = 0.3
 
 # 模型保存参数
@@ -51,6 +60,10 @@ experiment_name = "googlenet_card_classification"  # 实验名称
 # 主函数 main()
 # ----------------------------
 def main():
+    # 设置CUDA优化标志
+    torch.backends.cudnn.benchmark = True  # 适合固定输入尺寸
+    torch.backends.cudnn.deterministic = False  # 提高速度，牺牲可重复性
+
     # 加载数据
     print("\nLoading data(加载数据中)...", flush=True)
     train_loader, valid_loader, test_loader, train_dataset = get_card_dataloaders(
@@ -89,7 +102,13 @@ def main():
 
     # 定义学习率调度器
     # 防止震荡或过拟合的关键
-    scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+        optimizer,
+        max_lr=max_lr,  # 更高的峰值学习率
+        steps_per_epoch=len(train_loader),
+        epochs=num_epochs,
+        pct_start=pct_start  # 训练阶段开始使用OneCycleLR的百分比
+    )
 
     # 训练模型
     print("\nStarting training(开始训练)...")
