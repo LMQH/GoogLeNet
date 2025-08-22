@@ -1,43 +1,75 @@
-import os
+from pathlib import Path
 from datetime import datetime
 from torch.utils.tensorboard import SummaryWriter
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
+from matplotlib.figure import Figure  # 显式导入
 
 
 class TensorBoardLogger:
-    def __init__(self, log_dir: str, experiment_name: str, subdir: str = ""):
+    def __init__(
+            self,
+            log_dir: Union[str, Path],
+            experiment_name: str,
+            subdir: str = "",
+            max_queue: int = 10,  # 新增队列大小参数
+            flush_secs: int = 120  # 新增刷新间隔
+
+    ):
         """
         初始化TensorBoard日志记录器
         """
-        self.log_dir = str(log_dir)
+        self.log_dir = Path(log_dir) if isinstance(log_dir, str) else log_dir
         self.experiment_name = str(experiment_name)
-        self.subdir = str(subdir)
+        self.subdir = subdir
+        self.max_queue = max_queue
+        self.flush_secs = flush_secs
         self.writer: Optional[SummaryWriter] = None
-        self.log_path: str = ""
+        self.log_path: Optional[Path] = None
         self._init_writer()
 
-    def _init_writer(self):
-        """初始化SummaryWriter，创建带时间戳的日志目录"""
+    def _init_writer(self) -> None:
+        """初始化SummaryWriter"""
         if not self.log_dir:
             return
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        dir_components = [self.log_dir, f"{self.experiment_name}_{timestamp}"]
+        dir_components = [self.log_dir]
         if self.subdir:
-            dir_components.insert(1, self.subdir)
+            dir_components.append(self.subdir)
+        dir_components.append(f"{self.experiment_name}_{timestamp}")
 
-            # 显式转换为str类型，解决类型注解警告
-            self.log_path = str(os.path.join(*map(str, dir_components)))
-            os.makedirs(self.log_path, exist_ok=True)
-            # 传入前再次确认类型为str
-            self.writer = SummaryWriter(log_dir=str(self.log_path))
-            print(f"TensorBoard logs saved to: {self.log_path}")
-            print(f"Start TensorBoard with: tensorboard --logdir={self.log_path}")
+        # 创建目录
+        self.log_path = Path(*dir_components)
+        self.log_path.mkdir(parents=True, exist_ok=True)
+
+        self.writer = SummaryWriter(
+            log_dir=str(self.log_path),
+            max_queue=self.max_queue,
+            flush_secs=self.flush_secs
+        )
+        print(f"TensorBoard logs saved to: {self.log_path}")
+        print(f"Start TensorBoard with: tensorboard --logdir={self.log_path}")
 
     def add_scalar(self, tag: str, value: float, step: int) -> None:
         """记录标量值"""
         if self.writer:
             self.writer.add_scalar(str(tag), value, step)
+
+    def add_figure(
+            self,
+            tag: str,
+            figure: Figure,
+            global_step: Optional[int] = None,
+            close: bool = True
+    ) -> None:
+        """添加matplotlib图像"""
+        if self.writer:
+            self.writer.add_figure(
+                tag=tag,
+                figure=figure,
+                global_step=global_step,
+                close=close
+            )
 
     def add_text(self, tag: str, text: str, step: Optional[int] = None) -> None:
         """记录文本信息"""

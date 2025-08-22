@@ -9,6 +9,12 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import time
 
 
+# 未下载数据集则使用kagglehub
+# import kagglehub
+# path = kagglehub.dataset_download("gpiosenka/cards_image-datasetclassification")
+# print("Path to dataset files:", path)  # 查看下载的默认路径
+
+
 # --------------------------------------
 # 超参数配置 Super parameter configuration
 # --------------------------------------
@@ -20,11 +26,11 @@ num_workers = 8  # 工作线程数
 label_smoothing = 0.1  # 标签平滑，默认为0
 
 # 训练相关参数
-num_epochs = 50  # 训练轮数
+num_epochs = 40  # 训练轮数
 learning_rate = 1e-4  # 学习率
 weight_decay = 1e-3  # 权重衰减
-dropout_prob = 0.3  # Dropout概率
-patience = 8  # 耐心值
+dropout_prob = 0.2  # Dropout概率
+patience = 7  # 耐心值
 delta = 0.001  # 停止条件，提升小于该值则停止训练
 
 # 辅助分类器权重，默认为0.3
@@ -94,12 +100,12 @@ def main():
         use_amp=True,
         # 启用TensorBoard日志
         log_dir=log_dir,
-        experiment_name=experiment_name
+        experiment_name="Train_Experiment"
     )
 
     # 测试模型
     print("\nEvaluating on test set(测试评估)...", flush=True)
-    test_model(model, test_loader, device)
+    test_model(model, test_loader, device, log_dir=log_dir, experiment_name="Test_Experiment")
 
 
 if __name__ == '__main__':

@@ -48,7 +48,8 @@ def train_model(
     # 初始化日志记录器
     logger = TensorBoardLogger(
         log_dir=log_dir or os.path.join(model_save_dir, "logs"),
-        experiment_name=experiment_name
+        experiment_name=experiment_name,
+        subdir="Train"
     )
 
     # 初始化混合精度缩放器
