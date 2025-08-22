@@ -11,8 +11,8 @@ class TensorBoardLogger:
             log_dir: Union[str, Path],
             experiment_name: str,
             subdir: str = "",
-            max_queue: int = 10,  # 新增队列大小参数
-            flush_secs: int = 120  # 新增刷新间隔
+            max_queue: int = 50,  # 新增队列大小参数
+            flush_secs: int = 300  # 新增刷新间隔
 
     ):
         """

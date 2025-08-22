@@ -13,6 +13,10 @@ import time
 # path = kagglehub.dataset_download("gpiosenka/cards_image-datasetclassification")
 # print("Path to dataset files:", path)  # 查看下载的默认路径，保存到项目相同路径下
 
+# 设置CUDA优化标志,提升训练速度(需cuDNN,可选)
+torch.backends.cudnn.benchmark = True  # 固定输入尺寸
+torch.backends.cudnn.deterministic = False  # 提高速度，牺牲可重复性
+
 
 # --------------------------------------
 # 超参数配置 Super parameter configuration
@@ -27,22 +31,23 @@ batch_size = min(128, int(gpu_memory / (1024**3) * 32))  # 经验公式
 # batch_size = 64  # 批次大小
 
 num_workers = 8  # 工作线程数
-label_smoothing = 0.1  # 标签平滑，默认为0
+label_smoothing = 0.2  # 标签平滑，默认为0
 
 # 训练相关参数
-num_epochs = 40  # 训练轮数
-
-# 优化器参数
-learning_rate = 1e-4  # 学习率
-weight_decay = 1e-3  # 权重衰减
-
+num_epochs = 50  # 训练轮数
 dropout_prob = 0.2  # Dropout概率
 patience = 7  # 耐心值
 delta = 0.001  # 停止条件，提升小于该值则停止训练
 
+# 优化器参数
+learning_rate = 3e-4  # 学习率
+weight_decay = 1e-4  # 权重衰减
+
 # OneCycleLR参数
-max_lr = learning_rate * 10  # 最大学习率
-pct_start = 0.3  # 学习率上升阶段比例
+max_lr = learning_rate * 3  # 最大学习率
+pct_start = 0.5  # 学习率上升阶段比例
+div_factor = 25  # 初始学习率=max_lr/div_factor
+final_div_factor = 1e4  # 最终学习率=max_lr*final_div_factor
 
 # 辅助分类器权重，默认为0.3
 W = 0.3
@@ -60,10 +65,6 @@ experiment_name = "googlenet_card_classification"  # 实验名称
 # 主函数 main()
 # ----------------------------
 def main():
-    # 设置CUDA优化标志
-    torch.backends.cudnn.benchmark = True  # 适合固定输入尺寸
-    torch.backends.cudnn.deterministic = False  # 提高速度，牺牲可重复性
-
     # 加载数据
     print("\nLoading data(加载数据中)...", flush=True)
     train_loader, valid_loader, test_loader, train_dataset = get_card_dataloaders(
@@ -107,7 +108,10 @@ def main():
         max_lr=max_lr,  # 更高的峰值学习率
         steps_per_epoch=len(train_loader),
         epochs=num_epochs,
-        pct_start=pct_start  # 训练阶段开始使用OneCycleLR的百分比
+        pct_start=pct_start,  # 训练阶段开始使用OneCycleLR的百分比
+        div_factor=div_factor,  # 初始学习率
+        final_div_factor=final_div_factor,  # 最终学习率
+        anneal_strategy='linear'  # 更平滑的退火
     )
 
     # 训练模型

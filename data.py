@@ -8,12 +8,12 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
 
     # 训练集增强
     train_transform = transforms.Compose([
-        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 2.0)),  # 高斯模糊
+        transforms.GaussianBlur(kernel_size=(3, 7), sigma=(0.1, 1.5)),  # 高斯模糊
         # 随机裁剪：裁剪比例为原图的 x%~y%，然后缩放到 224x224
         transforms.RandomResizedCrop(
             size=224,  # 输出尺寸
-            scale=(0.90, 1.0),  # 裁剪区域占原图比例范围
-            ratio=(0.90, 1.05)  # 宽高比范围
+            scale=(0.95, 1.0),  # 裁剪区域占原图比例范围
+            ratio=(0.95, 1.05)  # 宽高比范围
         ),
         # transforms.RandomHorizontalFlip(p=0.3),  # 随机水平翻转
         transforms.RandomRotation(5),   # 随机旋转
@@ -26,11 +26,15 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
         transforms.RandomAffine(        # 平移+缩放
             degrees=0,  # 旋转角度
             translate=(0.05, 0.05),
-            scale=(0.95, 1.05)
+            scale=(0.97, 1.03)
         ),
-        transforms.RandomPerspective(distortion_scale=0.2, p=0.2),  # 透视变换
+        transforms.RandomPerspective(distortion_scale=0.15, p=0.15),  # 透视变换
         transforms.ToTensor(),
-        transforms.RandomErasing(p=0.2, scale=(0.02, 0.1), ratio=(0.3, 3.3)),  # 随机擦除
+        transforms.RandomErasing(       # 随机擦除
+            p=0.15,
+            scale=(0.02, 0.08),
+            ratio=(0.5, 2.0)
+        ),
         transforms.Normalize(           # 使用 ImageNet 预训练模型的均值和标准差
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225]
