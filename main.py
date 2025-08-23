@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import time
+# 从最上层导入GoogLeNet_cards
 from GoogLeNet_cards.cards_classification.data.dataloader import get_card_dataloaders
 from GoogLeNet_cards.cards_classification.models.GoogLeNet import get_frozen_googlenet
 from GoogLeNet_cards.cards_classification.training.train import train_model

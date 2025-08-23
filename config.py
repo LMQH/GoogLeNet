@@ -22,7 +22,7 @@ BATCH_SIZE = min(128, int(GPU_MEMORY / (1024**3) * 32))  # 经验公式
 # 训练相关参数
 NUM_EPOCHS = 60               # 训练轮数
 DROPOUT_PROB = 0.2            # Dropout概率
-PATIENCE = 8                  # 早停耐心值
+PATIENCE = 10                 # 早停耐心值
 DELTA = 0.001                 # 早停判断阈值
 NUM_WORKERS = 8               # 数据加载工作线程数
 LABEL_SMOOTHING = 0.2         # 标签平滑系数

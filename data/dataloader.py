@@ -15,13 +15,13 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
             scale=(0.95, 1.0),  # 裁剪区域占原图比例范围
             ratio=(0.95, 1.05)  # 宽高比范围
         ),
-        # transforms.RandomHorizontalFlip(p=0.3),  # 随机水平翻转
-        transforms.RandomRotation(5),   # 随机旋转
+
+        transforms.RandomRotation(3),   # 随机旋转
         transforms.ColorJitter(         # 随机改变亮度、对比度、饱和度
-            brightness=0.1,  # 亮度
-            contrast=0.1,  # 对比度
-            saturation=0.1,  # 饱和度
-            hue=0.02  # 色调
+            brightness=0.10,  # 亮度
+            contrast=0.10,  # 对比度
+            saturation=0.10,  # 饱和度
+            hue=0.01  # 色调
         ),
         transforms.RandomAffine(        # 平移+缩放
             degrees=0,  # 旋转角度
