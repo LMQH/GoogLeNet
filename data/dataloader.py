@@ -16,7 +16,7 @@ def get_card_dataloaders(data_root, batch_size, num_workers):
             ratio=(0.95, 1.05)  # 宽高比范围
         ),
 
-        transforms.RandomRotation(3),   # 随机旋转
+        transforms.RandomRotation(5),   # 随机旋转
         transforms.ColorJitter(         # 随机改变亮度、对比度、饱和度
             brightness=0.10,  # 亮度
             contrast=0.10,  # 对比度

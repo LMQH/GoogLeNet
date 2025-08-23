@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
 from typing import Union
+from pathlib import Path
 
 
 def _calculate_and_print_metrics(
@@ -98,6 +99,11 @@ def _confusion_matrix(all_labels: np.ndarray, all_preds: np.ndarray, class_names
             print(f"Warning: Failed to log confusion matrix image to TensorBoard: {e}")
     elif logger:
         print("Warning: Provided logger does not have a 'writer' attribute. Confusion matrix image not logged.")
+
+    # 保存为图片,有需求可选
+    # confusion_matrix_path = Path(logger.log_path) / "confusion_matrix.png"
+    # fig.savefig(confusion_matrix_path, dpi=300, bbox_inches='tight')
+    # print(f"Confusion matrix saved to: {confusion_matrix_path}")
 
     plt.close(fig)
 

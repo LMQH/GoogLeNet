@@ -76,7 +76,7 @@ def predict_image(session, image_tensor, class_names):
     confidence = np.max(probs)
 
     # 如果置信度低于阈值，则返回未知类别
-    if confidence < 0.5:  # 假设阈值设为50%
+    if confidence < 0.3:  # 置信阈值
         class_name = "未知类别"
     else:
         class_name = class_names[predicted_idx]
@@ -85,7 +85,7 @@ def predict_image(session, image_tensor, class_names):
 
 
 def main():
-    IMAGE = "image_pred/Spades_A.png"
+
     # 配置路径
     ONNX_MODEL_PATH = str(PROJECT_ROOT / "model" / "final_model.onnx")  # ONNX模型路径
     TEST_DIR = str(PROJECT_ROOT / "dataset" / "cards_image"/ "img" / "test")  # 拼接测试集路径
@@ -112,7 +112,7 @@ def main():
         class_name, confidence = predict_image(session, input_tensor, class_names)
 
         # 5. 打印结果
-        print("\n预测结果:")
+        print("\n>>预测结果如下")
         # print(f"图片路径: {IMAGE_PATH}")
         print(f"预测类别: {class_name}")
         print(f"置信度: {confidence:.2%}")
@@ -122,4 +122,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # IMAGE = "image_pred/Spades_A.png"
+    # IMAGE = "image_pred/Plum_K.jpg"
+    IMAGE = "image_pred/joker.jpg"
     main()
