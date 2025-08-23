@@ -1,7 +1,7 @@
 from typing import Optional, Dict
 import numpy as np
 import sklearn.metrics as sk_metrics
-from logger import TensorBoardLogger  # 导入日志类
+from .logger import TensorBoardLogger  # 导入日志类
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
@@ -37,7 +37,7 @@ def _calculate_and_print_metrics(
     }
 
 
-def _calculate_and_plot_confusion_matrix(all_labels: np.ndarray, all_preds: np.ndarray, class_names: list,
+def _confusion_matrix(all_labels: np.ndarray, all_preds: np.ndarray, class_names: list,
                                          logger: Optional[TensorBoardLogger] = None):
     """计算并绘制混淆矩阵，可选地记录到TensorBoard"""
     print(f"\n[Calculating Confusion Matrix...]")
@@ -102,7 +102,7 @@ def _calculate_and_plot_confusion_matrix(all_labels: np.ndarray, all_preds: np.n
     plt.close(fig)
 
 
-def _generate_and_save_classification_report(all_labels: np.ndarray, all_preds: np.ndarray, class_names: list,
+def _classification_report(all_labels: np.ndarray, all_preds: np.ndarray, class_names: list,
                                              logger: Optional[TensorBoardLogger] = None,
                                              excel_save_path: Optional[str] = None):
     """生成分类报告，可选地记录到TensorBoard和保存为Excel"""

@@ -1,15 +1,14 @@
 import os
 import torch
 import torch.nn as nn
+import sys
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from evaluate import _evaluate_model
-from early import EarlyStopping
-import sys
+from .evaluate import _evaluate_model
+from .early_stop import EarlyStopping
+from GoogLeNet_cards.cards_classification.utils.logger import TensorBoardLogger
 # 导入混合精度相关模块
 from torch.amp import autocast, GradScaler
-# 导入新的日志类
-from logger import TensorBoardLogger
 
 
 def train_model(
@@ -186,6 +185,24 @@ def train_model(
 
     # 加载最佳模型权重
     model.load_state_dict(torch.load(best_model_path, map_location=device, weights_only=True))
+
+    # 导出ONNX模型
+    dummy_input = (torch.randn(1, 3, 224, 224).to(device),)  # 注意末尾的逗号，表示单元素元组
+    onnx_path = os.path.join(model_save_dir, "final_model.onnx")
+
+    torch.onnx.export(
+        model,
+        dummy_input,
+        onnx_path,
+        input_names=["input"],
+        output_names=["output"],
+        dynamic_axes={
+            'input': {0: 'batch_size'},
+            'output': {0: 'batch_size'}
+        }
+    )
+    print(f"\n最终ONNX模型已保存到: {onnx_path}")
+
     return model
 
 

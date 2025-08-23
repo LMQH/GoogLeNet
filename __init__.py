@@ -1,9 +1,7 @@
-# __init__.py
-from .test import test_model
-from .data import get_card_dataloaders
-from .model import get_frozen_googlenet
-from .train import train_model
-
+from .data.dataloader import get_card_dataloaders
+from .models.GoogLeNet import get_frozen_googlenet
+from .training.train import train_model
+from .testing.test import test_model
 
 __all__ = [
     "get_card_dataloaders",

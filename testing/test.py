@@ -4,15 +4,17 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from typing import Tuple, Optional, Union, Dict, Any
 import numpy as np
-from evaluate import _evaluate_model
-from logger import TensorBoardLogger  # 导入日志类
 from tqdm import tqdm
 import sys
 import os
 from pathlib import Path
-from calculate import (_calculate_and_print_metrics,
-                       _calculate_and_plot_confusion_matrix,
-                       _generate_and_save_classification_report)
+from GoogLeNet_cards.cards_classification.training.evaluate import _evaluate_model
+from GoogLeNet_cards.cards_classification.utils.logger import TensorBoardLogger
+from GoogLeNet_cards.cards_classification.utils.metrics import (
+    _calculate_and_print_metrics,
+    _confusion_matrix,
+    _classification_report
+)
 
 
 def test_model(
@@ -91,9 +93,9 @@ def test_model(
     # 计算并打印评估指标
     metrics_dict = _calculate_and_print_metrics(all_labels, all_preds)
     # 绘制混淆矩阵
-    _calculate_and_plot_confusion_matrix(all_labels, all_preds, class_names, logger)
+    _confusion_matrix(all_labels, all_preds, class_names, logger)
     # 生成分类报告
-    _generate_and_save_classification_report(all_labels, all_preds, class_names, logger, excel_save_path)
+    _classification_report(all_labels, all_preds, class_names, logger, excel_save_path)
 
     if logger:
         try:
@@ -105,6 +107,7 @@ def test_model(
             print(f"Warning: Failed to log standard metrics to TensorBoard: {e}")
 
     print("\n[Test completed and detailed metrics logged/saved.(测试完成并记录保存详细指标)]", flush=True)
+
     return test_loss, test_acc, metrics_dict
 
 
